@@ -1,0 +1,27 @@
+name: Build iOS App
+on: [push]
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with: { java-version: '17', distribution: 'zulu' }
+        
+      - name: Build Xcode và Đóng gói IPA
+        run: |
+          cd iosApp
+          # Ép xuất file ra đúng thư mục build của mình
+          xcodebuild clean build -project iosApp.xcodeproj -scheme iosApp -configuration Release -sdk iphoneos CODE_SIGNING_ALLOWED=NO CONFIGURATION_BUILD_DIR=$PWD/build
+          
+          # Đóng gói theo chuẩn Apple: Bỏ vào thư mục Payload rồi Zip lại
+          mkdir -p Payload
+          mv build/iosApp.app Payload/
+          zip -r TinhDiem.ipa Payload
+          
+      - name: Đẩy ra quầy (Upload Artifact)
+        uses: actions/upload-artifact@v4
+        with:
+          name: App-TinhDiem-iOS
+          path: iosApp/TinhDiem.ipa
