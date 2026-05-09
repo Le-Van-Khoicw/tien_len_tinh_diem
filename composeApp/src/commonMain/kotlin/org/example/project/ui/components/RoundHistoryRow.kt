@@ -20,6 +20,7 @@ import org.example.project.ui.theme.LossRed
 import org.example.project.ui.theme.TextDark
 import org.example.project.ui.theme.WinGreen
 import org.example.project.data.Player
+
 @Composable
 fun RoundHistoryRow(
     round: GameRound,
@@ -38,7 +39,6 @@ fun RoundHistoryRow(
                 fontSize = 14.sp
             )
 
-            // DÙNG VÒNG LẶP FOR ĐỂ GIỮ SCOPE CHO WEIGHT
             for (player in players) {
                 val diem = round.scoreChanges[player.id] ?: 0
                 val mauChu = if (diem > 0) WinGreen else if (diem < 0) LossRed else TextDark
@@ -46,7 +46,7 @@ fun RoundHistoryRow(
 
                 Text(
                     text = "$dauCach$diem",
-                    modifier = Modifier.weight(1f), // Hết lỗi ở đây!
+                    modifier = Modifier.weight(1f),
                     color = mauChu,
                     textAlign = TextAlign.Center,
                     fontWeight = FontWeight.Medium
@@ -54,9 +54,8 @@ fun RoundHistoryRow(
             }
         }
 
-        // ĐỔI THÀNH HorizontalDivider CỦA MATERIAL 3
         HorizontalDivider(
-            color = Color.LightGray,
+            color = Color.LightGray.copy(alpha = 0.5f),
             thickness = 0.5.dp
         )
     }

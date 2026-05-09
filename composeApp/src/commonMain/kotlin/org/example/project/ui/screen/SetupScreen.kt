@@ -76,7 +76,9 @@ fun SetupScreen(
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 colors = TextFieldDefaults.colors(
                                     focusedContainerColor = Color.Transparent,
-                                    unfocusedContainerColor = Color.Transparent
+                                    unfocusedContainerColor = Color.Transparent,
+                                    disabledContainerColor = Color.Transparent,
+                                    errorContainerColor = Color.Transparent
                                 )
                             )
                         }
@@ -134,12 +136,13 @@ fun PlayerInputItem(value: String, onValueChange: (String) -> Unit, label: Strin
                 placeholder = { Text(label, fontSize = 12.sp) },
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = Color.Transparent,
-                    unfocusedContainerColor = Color.Transparent
+                    unfocusedContainerColor = Color.Transparent,
+                    disabledContainerColor = Color.Transparent,
+                    errorContainerColor = Color.Transparent
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .onFocusChanged { focusState ->
-                        // Khi chạm vào ô nhập lần đầu, nếu đang là tên mặc định thì xóa trắng
                         if (focusState.isFocused && !hasBeenFocused && value.startsWith("Người chơi")) {
                             onValueChange("")
                             hasBeenFocused = true
