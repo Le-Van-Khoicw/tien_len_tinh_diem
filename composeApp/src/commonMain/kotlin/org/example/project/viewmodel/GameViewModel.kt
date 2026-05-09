@@ -70,7 +70,14 @@ class GameViewModel : ViewModel() {
 
     private fun loadData() {
         try {
-            val data: GameData? = settings.decodeValueOrNull(GameData.serializer(), STORAGE_KEY)
+            // iOS: Bọc kỹ try-catch để tránh crash khi nạp dữ liệu cũ
+            val data: GameData? = try {
+                settings.decodeValueOrNull(GameData.serializer(), STORAGE_KEY)
+            } catch (e: Exception) {
+                settings.remove(STORAGE_KEY)
+                null
+            }
+            
             if (data != null) {
                 matchHistory.clear()
                 matchHistory.addAll(data.matchHistory)
@@ -232,7 +239,7 @@ class GameViewModel : ViewModel() {
 
         luuVanVaoSo(bienDongDiem)
         toNhap.value = RoundDraft()
-        saveData() // LƯU SAU KHI CHỐT VÁN
+        saveData()
     }
 
     private fun luuVanVaoSo(diemMoi: Map<Int, Int>) {

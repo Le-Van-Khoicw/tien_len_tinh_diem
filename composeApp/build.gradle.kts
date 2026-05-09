@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-    id("org.jetbrains.kotlin.plugin.serialization") version "2.3.21"
+    alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
@@ -37,14 +37,12 @@ kotlin {
             implementation(libs.compose.material3)
             implementation(libs.compose.ui)
             implementation(libs.compose.components.resources)
-            implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
             implementation(libs.androidx.navigation.compose)
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.multiplatform.settings)
             implementation(libs.multiplatform.settings.serialization)
-            implementation("org.jetbrains.compose.material:material:1.6.11")
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
@@ -82,4 +80,3 @@ android {
 dependencies {
     debugImplementation(libs.compose.uiTooling)
 }
-
