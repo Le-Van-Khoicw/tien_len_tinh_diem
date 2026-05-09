@@ -21,7 +21,7 @@ jobs:
           
           # Đóng gói theo chuẩn Apple: Bỏ vào thư mục Payload rồi Zip lại
           mkdir -p Payload
-          mv build/iosApp.app Payload/
+          mv build/*.app Payload/
           zip -r TinhDiem.ipa Payload
           
       - name: Đẩy ra quầy (Upload Artifact)
