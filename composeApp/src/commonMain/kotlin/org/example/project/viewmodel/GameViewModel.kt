@@ -25,7 +25,7 @@ data class GameData(
 
 @OptIn(ExperimentalSerializationApi::class, ExperimentalSettingsApi::class)
 class GameViewModel : ViewModel() {
-    private val settings: Settings = Settings()
+    private val settings: Settings by lazy { Settings() }
     private val STORAGE_KEY = "game_data_v2"
 
     val matchHistory = mutableStateListOf<GameMatch>()
