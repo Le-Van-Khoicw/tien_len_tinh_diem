@@ -5,9 +5,13 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+      
       - name: Setup Java
         uses: actions/setup-java@v3
         with: { java-version: '17', distribution: 'zulu' }
+        
+      - name: Cấp quyền thực thi cho Gradle
+        run: chmod +x gradlew
         
       - name: Build Xcode và Đóng gói IPA
         run: |
