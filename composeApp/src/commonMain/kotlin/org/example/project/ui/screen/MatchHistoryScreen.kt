@@ -5,9 +5,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -27,18 +24,23 @@ fun MatchHistoryScreen(
     viewModel: GameViewModel,
     onAddNewMatch: () -> Unit
 ) {
-    // Chuyển sang dùng SnapshotStateList trực tiếp để Compose quan sát tốt nhất
-    val matchHistory = viewModel.matchHistory
+    val history = viewModel.matchHistory
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { 
                     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        Text("Lịch sử trận đấu (${matchHistory.size})", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                        Text("Lịch sử trận đấu (${history.size})", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = WarmOrange)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = WarmOrange,
+                    titleContentColor = Color.Black,
+                    actionIconContentColor = Color.Black,
+                    navigationIconContentColor = Color.Black,
+                    scrolledContainerColor = WarmOrange
+                )
             )
         },
         floatingActionButton = {
@@ -57,7 +59,7 @@ fun MatchHistoryScreen(
                 .padding(padding)
                 .background(WarmCream)
         ) {
-            if (matchHistory.isEmpty()) {
+            if (history.isEmpty()) {
                 EmptyHistoryContent()
             } else {
                 LazyColumn(
@@ -65,7 +67,7 @@ fun MatchHistoryScreen(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(matchHistory) { match ->
+                    items(history) { match ->
                         MatchItem(match)
                     }
                 }

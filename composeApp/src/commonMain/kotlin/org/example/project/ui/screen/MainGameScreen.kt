@@ -32,8 +32,6 @@ fun MainGameScreen(
     if (winner != null) {
         AlertDialog(
             onDismissRequest = { },
-            title = { Text("🏆 CHIẾN THẮNG!") },
-            text = { Text("Chúc mừng ${winner.name} đã giành chiến thắng chung cuộc!") },
             confirmButton = {
                 Button(onClick = { 
                     viewModel.nguoiThangCuoc.value = null 
@@ -42,7 +40,9 @@ fun MainGameScreen(
                 }) {
                     Text("Kết thúc & Lưu")
                 }
-            }
+            },
+            title = { Text("🏆 CHIẾN THẮNG!") },
+            text = { Text("Chúc mừng ${winner.name} đã giành chiến thắng chung cuộc!") }
         )
     }
 
@@ -50,8 +50,6 @@ fun MainGameScreen(
     if (showExitDialog) {
         AlertDialog(
             onDismissRequest = { showExitDialog = false },
-            title = { Text("Kết thúc trận?") },
-            text = { Text("Toàn bộ lịch sử ván đấu của trận này sẽ được lưu lại.") },
             confirmButton = {
                 Button(
                     onClick = { 
@@ -68,12 +66,16 @@ fun MainGameScreen(
                 TextButton(onClick = { showExitDialog = false }) {
                     Text("Tiếp tục chơi")
                 }
-            }
+            },
+            title = { Text("Kết thúc trận?") },
+            text = { Text("Toàn bộ lịch sử ván đấu của trận này sẽ được lưu lại.") }
         )
     }
 
     if (showSheet) {
-        ModalBottomSheet(onDismissRequest = { showSheet = false }) {
+        ModalBottomSheet(
+            onDismissRequest = { showSheet = false }
+        ) {
             ScoreEntrySheet(viewModel = viewModel, onDismiss = { showSheet = false })
         }
     }
@@ -83,7 +85,6 @@ fun MainGameScreen(
             TopAppBar(
                 title = { Text("Bàn chơi", fontWeight = FontWeight.Bold) },
                 actions = {
-                    // NÚT THOÁT TRẬN (Prominent)
                     Button(
                         onClick = { showExitDialog = true },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Black.copy(alpha = 0.1f)),
@@ -92,7 +93,13 @@ fun MainGameScreen(
                         Text("KẾT THÚC", fontSize = 12.sp, color = Color.Black)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = WarmOrange)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = WarmOrange,
+                    titleContentColor = Color.Black,
+                    actionIconContentColor = Color.Black,
+                    navigationIconContentColor = Color.Black,
+                    scrolledContainerColor = WarmOrange
+                )
             )
         },
         floatingActionButton = {
@@ -110,7 +117,6 @@ fun MainGameScreen(
                 .fillMaxSize()
                 .background(WarmCream)
         ) {
-            // Header: Avatar & Score
             Row(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
                 Spacer(modifier = Modifier.width(40.dp))
                 viewModel.players.forEach { player ->
@@ -120,7 +126,6 @@ fun MainGameScreen(
 
             HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
 
-            // Danh sách các ván
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(viewModel.danhSachVanDau) { round ->
                     RoundHistoryRow(round = round, players = viewModel.players)
