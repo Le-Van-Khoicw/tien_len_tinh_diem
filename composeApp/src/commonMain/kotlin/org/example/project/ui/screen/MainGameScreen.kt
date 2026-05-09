@@ -24,43 +24,42 @@ fun MainGameScreen(
     viewModel: GameViewModel,
     onExitGame: () -> Unit
 ) {
-    
     var showSheet by remember { mutableStateOf(false) }
     var showExitDialog by remember { mutableStateOf(false) }
 
-    // --- CỜ BÁO THẮNG CUỘC ---
+    // --- DIALOG CHIẾN THẮNG ---
     val winner = viewModel.nguoiThangCuoc.value
     if (winner != null) {
         AlertDialog(
-            onDismissRequest = { /* Không cho tắt ngang */ },
+            onDismissRequest = { },
             title = { Text("🏆 CHIẾN THẮNG!") },
-            text = { Text("Chúc mừng ${winner.name} đã chạm mốc và giành chiến thắng chung cuộc!") },
+            text = { Text("Chúc mừng ${winner.name} đã giành chiến thắng chung cuộc!") },
             confirmButton = {
                 Button(onClick = { 
                     viewModel.nguoiThangCuoc.value = null 
-                    viewModel.ketThucVaLuuTran() // LƯU TRẬN KHI THẮNG
+                    viewModel.ketThucVaLuuTran()
                     onExitGame()
                 }) {
-                    Text("Kết thúc trận")
+                    Text("Kết thúc & Lưu")
                 }
             }
         )
     }
 
-    // --- DIALOG XÁC NHẬN THOÁT SỚM ---
+    // --- DIALOG XÁC NHẬN THOÁT ---
     if (showExitDialog) {
         AlertDialog(
             onDismissRequest = { showExitDialog = false },
-            title = { Text("Kết thúc trận đấu?") },
-            text = { Text("Bạn có chắc muốn kết thúc trận đấu này và lưu lại lịch sử không?") },
+            title = { Text("Kết thúc trận?") },
+            text = { Text("Toàn bộ lịch sử ván đấu của trận này sẽ được lưu lại.") },
             confirmButton = {
                 Button(
                     onClick = { 
                         showExitDialog = false
-                        viewModel.ketThucVaLuuTran() // LƯU TRẬN KHI THOÁT SỚM
+                        viewModel.ketThucVaLuuTran()
                         onExitGame() 
                     },
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
+                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF388E3C))
                 ) {
                     Text("Kết thúc & Lưu", color = Color.White)
                 }
@@ -84,14 +83,16 @@ fun MainGameScreen(
             TopAppBar(
                 title = { Text("Bàn chơi", fontWeight = FontWeight.Bold) },
                 actions = {
-                    IconButton(onClick = { showExitDialog = true }) {
-                        Text("X", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = Color.Black)
+                    // NÚT THOÁT TRẬN (Prominent)
+                    Button(
+                        onClick = { showExitDialog = true },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Black.copy(alpha = 0.1f)),
+                        modifier = Modifier.padding(end = 8.dp)
+                    ) {
+                        Text("KẾT THÚC", fontSize = 12.sp, color = Color.Black)
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = WarmOrange,
-                    titleContentColor = Color.Black
-                )
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = WarmOrange)
             )
         },
         floatingActionButton = {
@@ -99,47 +100,30 @@ fun MainGameScreen(
                 onClick = { showSheet = true },
                 containerColor = WarmOrange
             ) {
-                Text(
-                    text = "+",
-                    style = androidx.compose.ui.text.TextStyle(
-                        fontSize = 30.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                )
+                Text("+", fontSize = 30.sp, fontWeight = FontWeight.Bold, color = Color.White)
             }
         }
-    ) { paddingValues ->
+    ) { padding ->
         Column(
             modifier = Modifier
-                .padding(paddingValues)
+                .padding(padding)
                 .fillMaxSize()
                 .background(WarmCream)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-            ) {
+            // Header: Avatar & Score
+            Row(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
                 Spacer(modifier = Modifier.width(40.dp))
                 viewModel.players.forEach { player ->
-                    PlayerHeaderItem(
-                        player = player,
-                        modifier = Modifier.weight(1f)
-                    )
+                    PlayerHeaderItem(player = player, modifier = Modifier.weight(1f))
                 }
             }
 
-            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+            HorizontalDivider(color = Color.LightGray.copy(alpha = 0.5f))
 
-            LazyColumn(
-                modifier = Modifier.fillMaxSize()
-            ) {
+            // Danh sách các ván
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(viewModel.danhSachVanDau) { round ->
-                    RoundHistoryRow(
-                        round = round,
-                        players = viewModel.players
-                    )
+                    RoundHistoryRow(round = round, players = viewModel.players)
                 }
             }
         }

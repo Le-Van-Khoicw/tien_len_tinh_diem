@@ -4,16 +4,16 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.example.project.data.GameMatch
@@ -27,24 +27,15 @@ fun MatchHistoryScreen(
     viewModel: GameViewModel,
     onAddNewMatch: () -> Unit
 ) {
-    val history = viewModel.matchHistory
+    // Chuyển sang dùng SnapshotStateList trực tiếp để Compose quan sát tốt nhất
+    val matchHistory = viewModel.matchHistory
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { 
                     Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                        Text("Đã chơi (${history.size})", fontSize = 18.sp, fontWeight = FontWeight.Medium)
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = { /* Cài đặt */ }) {
-                        Icon(Icons.Default.Settings, contentDescription = "Settings")
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { /* Menu */ }) {
-                        Text("...", fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                        Text("Lịch sử trận đấu (${matchHistory.size})", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = WarmOrange)
@@ -53,24 +44,30 @@ fun MatchHistoryScreen(
         floatingActionButton = {
             ExtendedFloatingActionButton(
                 onClick = onAddNewMatch,
-                containerColor = Color(0xFFFFE0B2),
+                containerColor = Color(0xFFFFCC80),
                 contentColor = Color.Black,
-                icon = { Text("+", fontSize = 24.sp) },
-                text = { Text("Trận mới") }
+                icon = { Text("+", fontSize = 24.sp, fontWeight = FontWeight.Bold) },
+                text = { Text("Trận mới", fontWeight = FontWeight.Bold) }
             )
         }
     ) { padding ->
-        if (history.isEmpty()) {
-            EmptyHistoryContent(padding)
-        } else {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .background(WarmCream)
-            ) {
-                items(history) { match ->
-                    MatchItem(match)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .background(WarmCream)
+        ) {
+            if (matchHistory.isEmpty()) {
+                EmptyHistoryContent()
+            } else {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(matchHistory) { match ->
+                        MatchItem(match)
+                    }
                 }
             }
         }
@@ -80,22 +77,44 @@ fun MatchHistoryScreen(
 @Composable
 fun MatchItem(match: GameMatch) {
     Card(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Trận đấu #${match.id}", fontWeight = FontWeight.Bold, color = Color.DarkGray)
-                Spacer(Modifier.weight(1f))
-                Text("${match.history.size} ván", fontSize = 12.sp, color = Color.Gray)
+                Surface(
+                    color = Color(0xFFF57C00),
+                    shape = RoundedCornerShape(8.dp)
+                ) {
+                    Text(
+                        text = "ID: ${match.id}",
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
+                        color = Color.White,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Spacer(Modifier.width(8.dp))
+                Text("${match.history.size} ván đấu", fontSize = 14.sp, color = Color.Gray)
             }
-            Spacer(Modifier.height(8.dp))
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp), thickness = 0.5.dp)
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
                 match.players.forEach { player ->
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(player.name, fontSize = 11.sp, color = Color.Gray)
-                        Text("${player.score}", fontWeight = FontWeight.Bold, color = if(player.score >= 0) Color(0xFF2E7D32) else Color.Red)
+                        Text(player.name, fontSize = 12.sp, color = Color.Gray, fontWeight = FontWeight.Medium)
+                        Text(
+                            text = if (player.score >= 0) "+${player.score}" else "${player.score}",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = if (player.score >= 0) Color(0xFF388E3C) else Color(0xFFD32F2F)
+                        )
                     }
                 }
             }
@@ -104,39 +123,26 @@ fun MatchItem(match: GameMatch) {
 }
 
 @Composable
-fun EmptyHistoryContent(padding: PaddingValues) {
+fun EmptyHistoryContent() {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)
-            .background(WarmCream)
-            .padding(24.dp),
+        modifier = Modifier.fillMaxSize().padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text("👋", fontSize = 40.sp)
-        Spacer(modifier = Modifier.height(16.dp))
+        Text("👋", fontSize = 60.sp)
+        Spacer(Modifier.height(16.dp))
         Text(
-            text = "Chào mừng bạn đến với\nỨng dụng ghi điểm bài tiến lên!",
-            textAlign = TextAlign.Center,
-            color = Color.Gray,
-            lineHeight = 24.sp
+            text = "Chào mừng bạn!\nBạn chưa có trận đấu nào được lưu.",
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            fontSize = 16.sp,
+            color = Color.Gray
         )
-        Spacer(modifier = Modifier.height(32.dp))
-        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.Start) {
-            InfoRow(text = "👉 Ấn vào \"Trận mới\" để tạo bàn chơi và nhập kết quả cho các ván.")
-            Spacer(modifier = Modifier.height(12.dp))
-            InfoRow(text = "👉 Vào mục cài đặt ⚙️ để thay đổi cách tính điểm.")
-        }
+        Spacer(Modifier.height(32.dp))
+        Text(
+            text = "Bấm nút \"Trận mới\" để bắt đầu ghi điểm ván bài đầu tiên nhé!",
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            fontSize = 14.sp,
+            color = Color.LightGray
+        )
     }
-}
-
-@Composable
-fun InfoRow(text: String) {
-    Text(
-        text = text,
-        fontSize = 14.sp,
-        color = Color.Gray,
-        modifier = Modifier.padding(bottom = 8.dp)
-    )
 }
